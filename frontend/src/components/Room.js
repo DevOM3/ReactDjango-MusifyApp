@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Grid, Button, Typography } from "@material-ui/core";
 import CreateRoomPage from './CreateRoomPage';
 // http://127.0.0.1:8000/room/TBKSZR
+// http://127.0.0.1:8000/room/KAMVBP
 
 const Room = props => {
     const [votesToSkip, setVotesToSkip] = useState(2);
@@ -56,10 +57,10 @@ const Room = props => {
             <Grid item xs={12} align="center">
                 <CreateRoomPage 
                     update 
-                    votesToSkip={votesToSkip} 
-                    guestCanPause={guestCanPause} 
+                    votesToSkipProp={votesToSkip} 
+                    guestCanPauseProp={guestCanPause} 
                     roomCode={roomCode} 
-                    updateCallBack={() => {}} 
+                    updateCallBack={getRoomDetails} 
                 />
             </Grid>
             <Grid item xs={12} align="center">
