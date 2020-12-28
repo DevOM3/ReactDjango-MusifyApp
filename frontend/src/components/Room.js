@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { Grid, Button, Typography } from "@material-ui/core";
 import CreateRoomPage from "./CreateRoomPage";
+import MusicPlayer from "./MusicPlayer";
 // http://127.0.0.1:8000/room/TBKSZR
 // http://127.0.0.1:8000/room/KAMVBP
 
@@ -12,6 +13,7 @@ const Room = (props) => {
   const [showSettings, setShowSettings] = useState(false);
   const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
   const [roomCode, setRoomCode] = useState(props.match.params.roomCode);
+  const [song, setSong] = useState({});
 
   const authenticateSpotify = () => {
     fetch("/spotify/is-authenticated")
@@ -26,6 +28,18 @@ const Room = (props) => {
             });
         }
       });
+  };
+
+  const getCurrentSong = () => {
+    fetch(`/spotify/current-song`)
+      .then((response) => {
+        if (!response.ok) {
+          return {};
+        } else {
+          return response.json();
+        }
+      })
+      .then((data) => setSong(data));
   };
 
   const getRoomDetails = () => {
@@ -62,6 +76,12 @@ const Room = (props) => {
 
   useEffect(() => {
     getRoomDetails();
+
+    const interval = setInterval(() => {
+      getCurrentSong();
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const renderSettingsButton = () => (
@@ -108,21 +128,14 @@ const Room = (props) => {
           Code: {roomCode}
         </Typography>
       </Grid>
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          Votes: {votesToSkip}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          Guest Can Pause: {guestCanPause.toString()}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          Host: {isHost.toString()}
-        </Typography>
-      </Grid>
+      <MusicPlayer
+        imageURL={song?.image_url}
+        title={song?.title}
+        artist={song?.artist}
+        duration={song?.duration}
+        time={song?.time}
+        isPlaying={song?.is_playing}
+      />
       {isHost && renderSettingsButton()}
       <Grid item xs={12} align="center">
         <Button
